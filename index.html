@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Twinkl Phonics Phase 3 · 自然拼读复习课 + 绘本阅读</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #f0f5fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            padding: 20px 20px 30px;
+            color: #1a2c3e;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            max-width: 900px;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1f6392, #4b9bcb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .progress-section {
+            background: white;
+            border-radius: 50px;
+            padding: 14px 22px;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2edf5;
+        }
+        .progress-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f6392;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .progress-bar-bg {
+            background: #e6edf4;
+            border-radius: 30px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #2c9e6e, #3ecf8c);
+            width: 0%;
+            height: 100%;
+            border-radius: 30px;
+            transition: width 0.35s ease;
+        }
+        
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin: 20px 0 20px;
+        }
+        .lesson-card {
+            background: white;
+            border-radius: 28px;
+            padding: 16px 6px 14px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #e0edf6;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .lesson-card:active { transform: scale(0.96); background: #f2f6fb; }
+        .lesson-number {
+            font-weight: 800;
+            font-size: 26px;
+            background: #eef3fc;
+            width: 54px;
+            height: 54px;
+            line-height: 54px;
+            border-radius: 54px;
+            margin: 0 auto 8px;
+            color: #1f6392;
+        }
+        .status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            padding: 5px 10px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .status-complete { background: #e0f3e9; color: #146b43; }
+        .status-incomplete { background: #fff0e0; color: #b45f1b; }
+        
+        .detail-panel {
+            background: white;
+            border-radius: 44px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+            margin-top: 8px;
+        }
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 28px;
+            background: #ffffff;
+            border-bottom: 1px solid #ecf3f8;
+        }
+        .detail-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+        }
+        .back-button {
+            background: #f0f5fb;
+            border: none;
+            width: 52px;
+            height: 52px;
+            border-radius: 52px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #1f6392;
+        }
+        .back-button:active { background: #e2eaf1; transform: scale(0.94);}
+        .module {
+            margin: 28px 24px 30px;
+            border-bottom: 1px solid #ecf3f8;
+            padding-bottom: 24px;
+        }
+        .module:last-child { border: none; margin-bottom: 20px; }
+        .module-title {
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .badge-icon {
+            background: #eef3fc;
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #2c6e9e;
+        }
+        .word-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .word-card, .phoneme-card {
+            background: #f9fbfe;
+            padding: 10px 24px;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 500;
+            border: 1px solid #dfe8f2;
+            cursor: pointer;
+        }
+        .word-card:active, .phoneme-card:active { transform: scale(0.96); background: #e9f0f6; }
+        .tricky-word {
+            background: #fff1e6;
+            border-left: 4px solid #e68a2e;
+            font-weight: 700;
+            color: #b1420f;
+        }
+        .test-mode-area {
+            background: #eef3fa;
+            border-radius: 44px;
+            padding: 16px 22px;
+            margin: 12px 22px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .test-btn {
+            background: #1f6392;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .test-btn:active { background: #0f4b70; transform: scale(0.96);}
+        .quiz-result {
+            font-size: 15px;
+            color: #1e4f73;
+            background: #ffffffcc;
+            padding: 8px 16px;
+            border-radius: 40px;
+        }
+        .complete-module-btn {
+            background: #f0f5fb;
+            border: 1px solid #cbdde9;
+            padding: 12px 34px;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #1f6392;
+        }
+        .complete-module-btn:active { transform: scale(0.96);}
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: #8ea2b5;
+            margin-top: 24px;
+            background: #ffffffba;
+            padding: 12px;
+            border-radius: 60px;
+        }
+        .hidden { display: none; }
+        
+        /* ==================== 绘本阅读模块 ==================== */
+        .storybook-container {
+            background: #fef9e8;
+            border-radius: 36px;
+            padding: 20px 22px;
+            margin-top: 12px;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.05);
+            border: 1px solid #f5e5c8;
+            min-height: 540px;
+            display: flex;
+            flex-direction: column;
+        }
+        .storybook-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .storybook-title {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c26e2e, #e89f3e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .page-controls {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            background: white;
+            padding: 6px 18px;
+            border-radius: 60px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .page-btn {
+            background: #f0e5d2;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 48px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #a5581c;
+        }
+        .page-btn:active { transform: scale(0.94);}
+        .page-btn:disabled { opacity: 0.4; transform: none; cursor: not-allowed; }
+        .page-indicator {
+            font-weight: 700;
+            font-size: 17px;
+            background: #fff0df;
+            padding: 6px 18px;
+            border-radius: 50px;
+            color: #8b4513;
+        }
+        
+        .storybook-page {
+            background: #fffaf0;
+            border-radius: 32px;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .story-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 32px;
+            align-items: stretch;
+            min-height: 400px;
+            flex: 1;
+        }
+        .story-image-area {
+            flex: 5;
+            background: #e7dcc8;
+            border-radius: 28px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 380px;
+        }
+        .story-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .story-image img {
+            width: 100%;
+            height: auto;
+            max-height: 420px;
+            object-fit: contain;
+            border-radius: 24px;
+            display: block;
+        }
+        .story-text-area {
+            flex: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        /* 第2-8页：可点击单词样式 */
+        .story-text-line-clickable {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #fef7e8;
+            padding: 14px 18px;
+            border-radius: 36px;
+            margin-bottom: 14px;
+            gap: 8px;
+            border-left: 6px solid #e9b87b;
+        }
+        .clickable-word {
+            display: inline-block;
+            background: #ffffff;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 17px;
+            font-weight: 500;
+            margin: 3px 5px;
+            cursor: pointer;
+            border: 1px solid #f3dfbf;
+        }
+        .clickable-word:active { transform: scale(0.96); background: #f4e5cf; }
+        
+        /* 第一页：只显示图片 + 朗读按钮，不显示任何文字 */
+        .first-page-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+        }
+        
+        .story-full-read {
+            background: #ebd5b3;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #5a2e0e;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .story-full-read:active { transform: scale(0.98); background: #dec595; }
+        .story-note {
+            font-size: 13px;
+            text-align: center;
+            color: #b48648;
+            margin-top: 16px;
+            flex-shrink: 0;
+        }
+        
+        @media (min-width: 1024px) and (orientation: landscape) {
+            .app-container { max-width: 1000px; }
+            .storybook-container { min-height: 560px; }
+            .story-layout { gap: 40px; }
+            .story-image img { max-height: 460px; }
+        }
+        
+        @media (max-width: 834px) and (orientation: portrait) {
+            .story-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .story-image-area {
+                min-height: 260px;
+                flex: none;
+            }
+            .story-image img {
+                max-height: 280px;
+            }
+            .story-text-area {
+                flex: none;
+            }
+            .storybook-container {
+                min-height: auto;
+            }
+        }
+        
+        button, .word-card, .phoneme-card, .lesson-card {
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div id="lessonsListView">
+        <div class="header">
+            <h1>📖 Twinkl Phonics · Phase 3</h1>
+            <div class="progress-section">
+                <div class="progress-label"><span>✨ 课程复习进度</span><span id="progressPercent">0%</span></div>
+                <div class="progress-bar-bg"><div class="progress-fill" id="globalProgressFill"></div></div>
+            </div>
+        </div>
+        <div class="lessons-grid" id="lessonsGrid"></div>
+        <div class="footer-note">
+            🎧 点击任意单词/音素 → 纯正美式发音<br>
+            📚 Lesson 5 & Lesson 10 配有完整互动绘本（第1页：图片+整页朗读；第2-8页：支持点词发音）
+        </div>
+    </div>
+
+    <div id="lessonDetailView" class="hidden">
+        <div class="detail-panel">
+            <div class="detail-header">
+                <h2 id="lessonTitle">Lesson 1</h2>
+                <button class="back-button" id="backToListBtn">←</button>
+            </div>
+            <div id="modulesContainer"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== 发音引擎 ====================
+    function speakWord(word) {
+        if (!window.speechSynthesis) { alert("您的浏览器不支持语音朗读"); return; }
+        window.speechSynthesis.cancel();
+        let processed = word.trim();
+        if (processed === "I" || processed === "i") processed = "eye";
+        const utterance = new SpeechSynthesisUtterance(processed);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.85;
+        utterance.pitch = 1.0;
+        
+        const setVoice = () => {
+            let voices = window.speechSynthesis.getVoices();
+            const usVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Siri') || v.name.includes('Google') || v.name.includes('Alex'))) 
+                         || voices.find(v => v.lang === 'en-US');
+            if (usVoice) utterance.voice = usVoice;
+            window.speechSynthesis.speak(utterance);
+        };
+        
+        if (window.speechSynthesis.getVoices().length === 0) {
+            window.speechSynthesis.addEventListener('voiceschanged', function handler() {
+                setVoice();
+                window.speechSynthesis.removeEventListener('voiceschanged', handler);
+            });
+        } else {
+            setVoice();
+        }
+    }
+    
+    function speakPhoneme(phoneme) {
+        let clean = phoneme.replace(/[\/]/g, '').toLowerCase();
+        const phonemeMap = {
+            "qu": "kw", "sh": "ʃ", "ch": "tʃ", "th": "θ", "ng": "ŋ",
+            "ai": "eɪ", "ee": "iː", "igh": "aɪ", "oa": "oʊ", "oo": "uː",
+            "ar": "ɑr", "or": "ɔr", "ur": "ɜr", "ow": "aʊ", "oi": "ɔɪ",
+            "ear": "ɪr", "air": "er", "ure": "ʊr", "er": "ər"
+        };
+        let speakText = phonemeMap[clean] || clean;
+        if (clean === "i") speakText = "eye";
+        if (clean === "a") speakText = "ay";
+        if (clean === "e") speakText = "ee";
+        if (clean === "o") speakText = "oh";
+        if (clean === "u") speakText = "you";
+        speakWord(speakText);
+    }
+
+    // ==================== 绘本数据 ====================
+    // 第一页：只有图片和整页朗读，不显示任何文字
+    const topDogPages = [
+        { imgUrl: "https://i.ibb.co/N6mBnHVn/lesson5-1.jpg", textLines: ["Recap Weeks 1-5", "Top Dog Fun", "A 'Let's Read Together!' Book"], isFirstPage: true },
+        { imgUrl: "https://i.ibb.co/pvm907Ly/lesson5-2.jpg", textLines: ["This is Gail.", "We can check his nails with the light."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/k6cK5wm3/lesson5-3.jpg", textLines: ["Can he keep his feet right on this mat?"], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/pr0TqqPm/lesson5-4.jpg", textLines: ["You need a long soak in the bath, Ben."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/wrxdXsK2/lesson5-5.jpg", textLines: ["Here is the soap to foam him all up."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/Q7mvx7mm/lesson5-6.jpg", textLines: ["We will chop his long coat."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/ynQKmWt8/lesson5-7.jpg", textLines: ["We can check his nails with the light."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/FkvJr7WQ/lesson5-8.jpg", textLines: ["Top Dog Fun", "Supports teaching:", "Twinkl Phonics Level 3 Week 11"], isFirstPage: false }
+    ];
+    
+    const pipRabbitPages = [
+        { imgUrl: "https://i.ibb.co/B5FKjVF3/Lesson10-1.jpg", textLines: ["Recap Weeks 6-10", "Pip Rabbit", "PIP RABBIT", "In Cinemas Now!", "A 'Let's Read Together!' Book"], isFirstPage: true },
+        { imgUrl: "https://i.ibb.co/sZJxc4K/Lesson10-2.jpg", textLines: ["Kit and Sam had lots of food and Tess had pick and mix."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/hJg2qvck/Lesson10-3.jpg", textLines: ["They all sat on velvet chairs."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/G30mcNs6/Lesson10-4.jpg", textLines: ["Pip dug in the soil and she had mud on her ears."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/0j2HSZ1S/Lesson10-5.jpg", textLines: ["The farmer did not lure Pip into his net."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/Dg7bSVgK/Lesson10-6.jpg", textLines: ["Tess got popcorn in her hair and ear."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/rRDZ9hWt/Lesson10-7.jpg", textLines: ["They all had to pick up the litter."], isFirstPage: false },
+        { imgUrl: "https://i.ibb.co/FLHjyJnM/Lesson10-8.jpg", textLines: ["Pip Rabbit", "Supports teaching:", "Twinkl Phonics Level 3 Week 12", "The End"], isFirstPage: false }
+    ];
+
+    // 创建绘本模块
+    function createStorybookModule(bookTitle, pages, containerElement) {
+        let currentPage = 0;
+        
+        function renderPage(pageIdx) {
+            const page = pages[pageIdx];
+            if (!page) return '<div>页面不存在</div>';
+            
+            let contentHtml;
+            
+            // 判断是否为第一页
+            if (page.isFirstPage === true) {
+                // 第一页：只显示图片和朗读按钮，不显示任何拆分文字
+                const fullPageText = page.textLines.join(' ');
+                contentHtml = `
+                    <div class="story-layout">
+                        <div class="story-image-area">
+                            <div class="story-image">
+                                <img src="${page.imgUrl}" alt="绘本封面第1页" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%23e7dcc8\'/%3E%3Ctext x=\'200\' y=\'150\' text-anchor=\'middle\' fill=\'%238b5a2b\' font-size=\'18\'%3E📖 图片加载中%3C/text%3E%3C/svg%3E'">
+                            </div>
+                        </div>
+                        <div class="story-text-area">
+                            <div class="first-page-container">
+                                <button class="story-full-read" data-fulltext="${fullPageText.replace(/"/g, '&quot;')}">🔊 朗读本页全部内容</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 第2-8页：可点击单词
+                const linesHtml = page.textLines.map(line => {
+                    const words = line.split(/(\s+)/).filter(w => w.trim().length > 0);
+                    const wordSpans = words.map(word => {
+                        let cleanWord = word.replace(/[.,!?;:()'"]+$/, '').replace(/^[.,!?;:()'"]+/, '');
+                        if (cleanWord === "") cleanWord = word;
+                        return `<span class="clickable-word" data-word="${cleanWord.replace(/"/g, '&quot;')}">${word}</span>`;
+                    }).join(' ');
+                    return `<div class="story-text-line-clickable">${wordSpans}</div>`;
+                }).join('');
+                const fullPageText = page.textLines.join(' ');
+                contentHtml = `
+                    <div class="story-layout">
+                        <div class="story-image-area">
+                            <div class="story-image">
+                                <img src="${page.imgUrl}" alt="绘本第${pageIdx+1}页" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%23e7dcc8\'/%3E%3Ctext x=\'200\' y=\'150\' text-anchor=\'middle\' fill=\'%238b5a2b\' font-size=\'18\'%3E📖 图片加载中%3C/text%3E%3C/svg%3E'">
+                            </div>
+                        </div>
+                        <div class="story-text-area">
+                            <div class="story-sentence-block">
+                                ${linesHtml}
+                            </div>
+                            <button class="story-full-read" data-fulltext="${fullPageText.replace(/"/g, '&quot;')}">🔊 朗读本页全部句子</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return `<div class="storybook-page">${contentHtml}</div>`;
+        }
+        
+        function updateContainer() {
+            if (!containerElement) return;
+            const pageHtml = renderPage(currentPage);
+            const isFirst = pages[currentPage].isFirstPage === true;
+            const noteText = isFirst ? '📖 第1页：点击下方按钮朗读整页内容' : '✨ 第2-8页：点击任意单词可单独发音 · 点击朗读按钮可听整句';
+            const controlsHtml = `
+                <div class="storybook-header">
+                    <div class="storybook-title">📘 ${bookTitle}</div>
+                    <div class="page-controls">
+                        <button class="page-btn prev-page" ${currentPage === 0 ? 'disabled' : ''}>◀</button>
+                        <span class="page-indicator">${currentPage+1} / ${pages.length}</span>
+                        <button class="page-btn next-page" ${currentPage === pages.length-1 ? 'disabled' : ''}>▶</button>
+                    </div>
+                </div>
+                ${pageHtml}
+                <div class="story-note">${noteText}</div>
+            `;
+            containerElement.innerHTML = controlsHtml;
+            
+            // 绑定翻页事件
+            const prevBtn = containerElement.querySelector('.prev-page');
+            const nextBtn = containerElement.querySelector('.next-page');
+            if (prevBtn && !prevBtn.disabled) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 0) {
+                        currentPage--;
+                        updateContainer();
+                    }
+                });
+            }
+            if (nextBtn && !nextBtn.disabled) {
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < pages.length - 1) {
+                        currentPage++;
+                        updateContainer();
+                    }
+                });
+            }
+            
+            // 只为非第一页绑定单词点读功能
+            if (!pages[currentPage].isFirstPage) {
+                containerElement.querySelectorAll('.clickable-word').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const word = el.getAttribute('data-word');
+                        if (word) speakWord(word);
+                    });
+                });
+            }
+            
+            // 整页朗读按钮始终可用
+            const fullReadBtn = containerElement.querySelector('.story-full-read');
+            if (fullReadBtn) {
+                const fullText = fullReadBtn.getAttribute('data-fulltext');
+                fullReadBtn.addEventListener('click', () => {
+                    if (fullText) speakWord(fullText);
+                });
+            }
+        }
+        
+        updateContainer();
+    }
+
+    // ==================== 课程数据 ====================
+    const lessonsData = [
+        { highFreq: [{word:"no",tricky:false},{word:"to",tricky:true},{word:"I",tricky:true}], phonemes: ["/a/","/b/","/c/","/d/","/e/"], phonics: ["jacket","well","wax","Jill","vat","vixen"], writing: ["van","jam","fox","wig","jet","vet","jacket","box","six"], sentence: "Now, we will jog to meet the farm vet." },
+        { highFreq: [{word:"the",tricky:true},{word:"go",tricky:false},{word:"no",tricky:false}], phonemes: ["/f/","/g/","/h/","/i/","/j/","/qu/"], phonics: ["yet","liquid","check","quiz","fuzz","rich"], writing: ["chop","fizz","yak","quick","chick","zip"], sentence: "Yes. Go and check if Buzz has liquid in his bucket." },
+        { highFreq: [{word:"to",tricky:true},{word:"go",tricky:false},{word:"I",tricky:true}], phonemes: ["/sh/","/ch/","/th/","/ng/"], phonics: ["shock","them","along","bother","wish","thing"], writing: ["fish fingers","chicken wings","thick mash"], sentence: "Can all the gang fit on the box with Tess? Then we will finish." },
+        { highFreq: [{word:"the",tricky:true},{word:"to",tricky:true},{word:"I",tricky:true}], phonemes: ["/ai/","/ee/","/igh/","/oa/","/oo/"], phonics: ["aid","keep","bait","again","feeling","sheet"], writing: ["feet","tail","chain","feed","teeth","nails"], sentence: "Yes, Gail can see Ben again this week." },
+        { highFreq: [{word:"go",tricky:false},{word:"no",tricky:false},{word:"to",tricky:true}], phonemes: ["/ar/","/or/","/ur/","/ow/","/oi/"], phonics: ["thigh","unload","oath","fight","tonight","shoal"], writing: ["star","corn","burn","cow","soil"], isStory: true, storyTitle: "Top Dog Fun", storyPages: topDogPages },
+        { highFreq: [{word:"the",tricky:true},{word:"to",tricky:true},{word:"no",tricky:false}], phonemes: ["/ear/","/air/","/ure/","/er/"], phonics: ["soon","tooth","book","hook","farmyard","sharp"], writing: ["book","food","foot","shark","star","car"], sentence: "Kit and Sam look at the food booth and get chips, a yum-yum and a jar of fizz." },
+        { highFreq: [{word:"go",tricky:false},{word:"I",tricky:true},{word:"to",tricky:true}], phonemes: ["/or/","/aw/","/ch/","/j/"], phonics: ["torch","cork","airport","church","burger","surf"], writing: ["torn","straw","chips","jump"], sentence: "I wish we had got a burger and a box of popcorn." },
+        { highFreq: [{word:"no",tricky:false},{word:"go",tricky:false},{word:"I",tricky:true}], phonemes: ["/ow/","/oi/","/ear/"], phonics: ["coin","oil","turmoil","owl","down","power"], writing: ["town","noise","fear"], sentence: "The farmer did not see her down in the soil." },
+        { highFreq: [{word:"the",tricky:true},{word:"to",tricky:true},{word:"no",tricky:false}], phonemes: ["/air/","/ear/","/ure/"], phonics: ["beard","gear","shearing","pair","chair","fair"], writing: ["hair","clear","pure"], sentence: "It is good that the farmer did not get near to Pip in her lair." },
+        { highFreq: [{word:"go",tricky:false},{word:"I",tricky:true},{word:"to",tricky:true}], phonemes: ["/ure/","/er/","/j/","/v/"], phonics: ["tower","secure","perch","pure","mature","river"], writing: ["adventure","veteran"], isStory: true, storyTitle: "Pip Rabbit", storyPages: pipRabbitPages }
+    ];
+
+    // 进度管理
+    let completedLessons = new Set();
+    let currentOpenLessonIndex = 0;
+    
+    function loadProgress() {
+        try { 
+            const saved = localStorage.getItem("phase3_completed_final_v2"); 
+            if(saved) completedLessons = new Set(JSON.parse(saved)); 
+        } catch(e) {}
+        updateGlobalProgress();
+    }
+    function saveProgress() { 
+        localStorage.setItem("phase3_completed_final_v2", JSON.stringify([...completedLessons])); 
+        updateGlobalProgress(); 
+        renderLessonsGrid(); 
+        if(currentOpenLessonIndex !== undefined) updateCompleteButton(); 
+    }
+    function markLessonComplete(idx) { 
+        if(completedLessons.has(idx)) completedLessons.delete(idx); 
+        else completedLessons.add(idx); 
+        saveProgress(); 
+        updateCompleteButton(); 
+    }
+    function updateCompleteButton() { 
+        const btn = document.getElementById('markCompleteBtnDynamic'); 
+        if(btn) { 
+            const isC = completedLessons.has(currentOpenLessonIndex); 
+            btn.innerText = isC ? "✅ 已完成复习" : "📌 标记本课完成"; 
+            btn.style.background = isC ? "#e0f2e8" : "#f0f4fa"; 
+        } 
+    }
+    function updateGlobalProgress() { 
+        let pct = Math.round((completedLessons.size / lessonsData.length) * 100); 
+        document.getElementById('progressPercent').innerText = `${pct}%`; 
+        document.getElementById('globalProgressFill').style.width = `${pct}%`; 
+    }
+    
+    function renderLessonDetail(idx) {
+        currentOpenLessonIndex = idx;
+        const lesson = lessonsData[idx];
+        const container = document.getElementById('modulesContainer');
+        
+        const highHtml = `<div class="module"><div class="module-title">⭐ 高频词</div><div class="word-grid">${(lesson.highFreq || []).map(i=>`<div class="word-card ${i.tricky?'tricky-word':''}" data-word="${i.word}">${i.word}${i.tricky?' ✨':''}</div>`).join('')}</div></div>`;
+        const phonemeHtml = `<div class="module"><div class="module-title">🎵 音素 (Phase 3)</div><div class="word-grid">${(lesson.phonemes || []).map(p=>`<div class="phoneme-card" data-phoneme="${p.replace(/[\/]/g,'')}">${p}</div>`).join('')}</div></div>`;
+        const phonicsHtml = `<div class="module"><div class="module-title">🗣️ 拼读单词</div><div class="word-grid">${(lesson.phonics || []).map(w=>`<div class="word-card" data-word="${w}">${w}</div>`).join('')}</div></div>`;
+        const writingHtml = `<div class="module"><div class="module-title">✍️ 书写单词</div><div class="word-grid">${(lesson.writing || []).map(w=>`<div class="word-card" data-word="${w}">${w}</div>`).join('')}</div></div>`;
+        
+        let storyHtml = '';
+        if (lesson.isStory && lesson.storyPages) {
+            const storyContainerId = `storybook_container_${idx}`;
+            storyHtml = `<div class="module"><div class="module-title">📚 绘本阅读 · 互动故事 <span class="badge-icon">8页翻读·第1页仅整页朗读</span></div><div id="${storyContainerId}" class="storybook-container"></div></div>`;
+            setTimeout(() => {
+                const storyContainer = document.getElementById(storyContainerId);
+                if (storyContainer) {
+                    createStorybookModule(lesson.storyTitle, lesson.storyPages, storyContainer);
+                }
+            }, 50);
+        } else {
+            const sentenceText = lesson.sentence || "✨ 尝试朗读这个句子！";
+            const words = sentenceText.split(/(\s+)/).filter(w=>w.trim().length>0);
+            const sentSpan = words.map(w => { 
+                let cw = w.replace(/[.,!?;:]$/, ''); 
+                return `<span class="word-card" data-word="${cw.replace(/"/g, '&quot;')}" style="display:inline-flex; margin:5px;">${w}</span>`; 
+            }).join(' ');
+            storyHtml = `<div class="module"><div class="module-title">📖 句子挑战</div><div style="display:flex; flex-wrap:wrap; padding:12px;">${sentSpan}</div><button class="complete-module-btn" id="fullSentenceSpeakBtn" style="margin-left:20px;">🔊 朗读完整句子</button></div>`;
+        }
+        
+        const testArea = `<div class="test-mode-area"><span>🎧 听音测试模式</span><button class="test-btn" id="launchListenTest">随机朗读拼读单词</button><span id="quizResultMsg" class="quiz-result"></span></div>`;
+        const completeBtn = `<div style="text-align:center; margin:12px 24px 28px;"><button id="markCompleteBtnDynamic" class="complete-module-btn">${completedLessons.has(idx) ? "✅ 已完成复习" : "📌 标记本课完成"}</button></div>`;
+        
+        container.innerHTML = highHtml + phonemeHtml + phonicsHtml + writingHtml + storyHtml + testArea + completeBtn;
+        document.getElementById('lessonTitle').innerHTML = `Lesson ${idx+1} · Phase 3 ${lesson.isStory ? '(绘本课)' : ''}`;
+        
+        document.querySelectorAll('#modulesContainer .word-card, .phoneme-card').forEach(el => {
+            el.addEventListener('click', () => {
+                let w = el.getAttribute('data-word');
+                if(w) speakWord(w);
+                else if(el.classList.contains('phoneme-card')) speakPhoneme(el.getAttribute('data-phoneme') || el.innerText);
+            });
+        });
+        
+        if (!lesson.isStory) {
+            const sentBtn = document.getElementById('fullSentenceSpeakBtn');
+            if (sentBtn && lesson.sentence) sentBtn.onclick = () => speakWord(lesson.sentence);
+        }
+        
+        const testBtn = document.getElementById('launchListenTest');
+        if(testBtn) {
+            testBtn.onclick = () => {
+                const ws = lesson.phonics;
+                if(ws && ws.length) {
+                    const rw = ws[Math.floor(Math.random() * ws.length)];
+                    speakWord(rw);
+                    const qd = document.getElementById('quizResultMsg');
+                    if(qd) qd.innerHTML = `🎧 测试词: “${rw}” 点击下方单词模仿跟读`;
+                    setTimeout(() => { if(qd) qd.innerHTML = ""; }, 2500);
+                } else {
+                    alert("本课没有拼读单词，无法测试～");
+                }
+            };
+        }
+        
+        const markBtn = document.getElementById('markCompleteBtnDynamic');
+        if(markBtn) markBtn.onclick = () => { markLessonComplete(idx); updateCompleteButton(); };
+    }
+    
+    function renderLessonsGrid() {
+        let grid = document.getElementById('lessonsGrid');
+        grid.innerHTML = '';
+        for(let i = 0; i < lessonsData.length; i++) {
+            let card = document.createElement('div');
+            card.className = 'lesson-card';
+            card.innerHTML = `<div class="lesson-number">${i+1}</div><div style="font-weight:500; font-size:13px;">${lessonsData[i].isStory ? '📖 绘本课' : 'Phase 3'}</div><div class="status-badge ${completedLessons.has(i) ? 'status-complete' : 'status-incomplete'}">${completedLessons.has(i) ? '✅ 已完成' : '📖 未完成'}</div>`;
+            card.addEventListener('click', () => { openLesson(i); });
+            grid.appendChild(card);
+        }
+    }
+    
+    function openLesson(idx) { 
+        renderLessonDetail(idx); 
+        document.getElementById('lessonsListView').classList.add('hidden'); 
+        document.getElementById('lessonDetailView').classList.remove('hidden'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    }
+    
+    function backToList() { 
+        window.speechSynthesis.cancel(); 
+        document.getElementById('lessonsListView').classList.remove('hidden'); 
+        document.getElementById('lessonDetailView').classList.add('hidden'); 
+        renderLessonsGrid(); 
+    }
+    
+    document.getElementById('backToListBtn').addEventListener('click', backToList);
+    loadProgress();
+    renderLessonsGrid();
+    
+    window.addEventListener('load', () => {
+        const silent = new SpeechSynthesisUtterance(' ');
+        silent.lang = 'en-US';
+        window.speechSynthesis.speak(silent);
+        setTimeout(() => window.speechSynthesis.cancel(), 200);
+    });
+</script>
+</body>
+</html>
